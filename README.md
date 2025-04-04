@@ -70,6 +70,23 @@ python main.py nodiscord # for run first time
 ## 📥 Configuration
 
 - `config.yaml`: Platform sources (JSON endpoints, fetch interval)
+- 🧰 DB Table Setup: 
+Before running, exec into your PostgreSQL container and create the table:
+
+```sql
+CREATE TABLE programs (
+    platform TEXT,
+    handle TEXT,
+    name TEXT,
+    data JSONB,
+    PRIMARY KEY (platform, handle)
+);
+```
+You can do this like:
+
+```bash
+docker-compose exec db psql -U postgres -d bugbounty
+```
 
 ## 📤 Notifications Example
 

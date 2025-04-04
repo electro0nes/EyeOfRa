@@ -1,0 +1,7 @@
+# config.yaml
+hackerone:
+  url: https://raw.githubusercontent.com/arkadiyt/bounty-targets-data/refs/heads/main/data/hackerone_data.json
+# bugcrowd:
+#   url: https://raw.githubusercontent.com/arkadiyt/bounty-targets-data/refs/heads/main/data/bugcrowd_data.json
+# intigriti:
+#   url: https://raw.githubusercontent.com/arkadiyt/bounty-targets-data/refs/heads/main/data/intigriti_data.json

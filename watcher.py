@@ -110,10 +110,10 @@ def detect_changes(platform, name, url, old, new, diff, webhook):
             "change_details": "\n".join(out_of_scope_details)
         }, webhook)
 
-    general_diff = DeepDiff(
-        old, new, ignore_order=True, 
-        exclude_paths=["root['targets']", "root['response_efficiency_percentage']"]
-    )
+    # general_diff = DeepDiff(
+    #     old, new, ignore_order=True, 
+    #     exclude_paths=["root['targets']", "root['response_efficiency_percentage']"]
+    # )
     
-    if general_diff and webhook:
-        notify_event('new_type', platform, name, url, {"changes": json.dumps(general_diff, indent=2)}, webhook)
+    # if general_diff and webhook:
+    #     notify_event('new_type', platform, name, url, {"changes": json.dumps(general_diff, indent=2)}, webhook)

@@ -1,11 +1,11 @@
-# 🕵️‍♂️ Program-Watcher
+# 🕵️‍♂️ Eye of Ra
 
 A bug bounty **program change monitoring tool** that keeps an eye on platforms like **HackerOne**, **Bugcrowd**, **YesWeHack**, and **Intigriti**.  
-Built with ❤️ by [electro0ne (Moein Erfanian)](https://github.com/moeinerfanian).
+Built with ❤️ by [electro0ne (Moein Erfanian)](https://github.com/electro0nes).
 
 ## 🔍 What It Does
 
-Program-Watcher monitors public bug bounty platforms and **alerts you via Discord** when:
+Eye of Ra monitors public bug bounty platforms and **alerts you via Discord** when:
 
 - 🖕 A new program is added
 - ❌ A program is removed
@@ -15,7 +15,6 @@ Program-Watcher monitors public bug bounty platforms and **alerts you via Discor
 - ⚪️ Out-of-scope entries are removed
 - 🔄 Scopes are changed or updated
 - 📌 Metadata like payout/response time changes
-- 💰 New bounty tables are introduced
 
 ## ⚙️ Features
 
@@ -35,8 +34,8 @@ Program-Watcher monitors public bug bounty platforms and **alerts you via Discor
 ## 🚀 Installation
 
 ```bash
-git clone https://github.com/moeinerfanian/Program-Watcher.git
-cd Program-Watcher
+git clone https://github.com/electro0nes/EyeOfRa.git
+cd EyeOfRa
 ```
 
 ### 🐳 Run with Docker Compose
@@ -44,11 +43,11 @@ cd Program-Watcher
 Make sure Docker is installed, then:
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 This will set up:
-- PostgreSQL database
+- MongoDB database
 - Python script environment
 
 ### 🧪 Local Run
@@ -56,10 +55,15 @@ This will set up:
 1. Install dependencies:
 
 ```bash
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
 2. Configure `config.yaml` and `.env` file with your **Discord Webhook** and database settings.
+
+```bash
+MONGO_URI=mongodb://localhost:27017
+DISCORD_WEBHOOK=URL
+```
 
 3. Run the watcher:
 
@@ -70,23 +74,6 @@ python main.py nodiscord # for run first time
 ## 📥 Configuration
 
 - `config.yaml`: Platform sources (JSON endpoints, fetch interval)
-- 🧰 DB Table Setup: 
-Before running, exec into your PostgreSQL container and create the table:
-
-```sql
-CREATE TABLE programs (
-    platform TEXT,
-    handle TEXT,
-    name TEXT,
-    data JSONB,
-    PRIMARY KEY (platform, handle)
-);
-```
-You can do this like:
-
-```bash
-docker-compose exec db psql -U postgres -d bugbounty
-```
 
 ## 📤 Notifications Example
 
@@ -101,7 +88,7 @@ New Scope Added:
 
 ## 👨‍💻 Author
 
-Made with ❤️ by [electro0ne (Moein Erfanian)](https://github.com/moeinerfanian)  
+Made with ❤️ by [electro0ne (Moein Erfanian)](https://github.com/electro0nes)  
 🚾 Bug Bounty Hunter & Automation Enthusiast
 
 ## 📜 License

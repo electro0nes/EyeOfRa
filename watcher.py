@@ -31,7 +31,7 @@ def fetch_and_process(platform, url, discord_webhook=None):
 
         diff = DeepDiff(old_data, program, ignore_order=True)
         if diff:
-            detect_changes(platform, name, program_url, old_data, program, diff, discord_webhook)
+            detect_changses(platform, name, program_url, old_data, program, diff, discord_webhook)
 
         insert_or_update_program(platform, handle, name, program)
 
@@ -56,64 +56,46 @@ def serialize_diff(diff):
     else:
         return diff
 
-def detect_changes(platform, name, url, old, new, diff, webhook):
-    old_targets = old.get('targets', {}) if old else {}
-    new_targets = new.get('targets', {}) if new else {}
+def detect_changses(platform, name, url, old, new, diff, webhook):
+    alerts = []
+
+    # Check for open <-> paused
+    old_state = old.get('submission_state')
+    new_state = new.get('submission_state')
+    if old_state != new_state:
+        if {old_state, new_state} == {"open", "paused"}:
+            alerts.append(f"Program state changed: `{old_state}` → `{new_state}`")
+
+    # BBP <-> VDP
+    old_bbp = old.get('allows_bounty_splitting')
+    new_bbp = new.get('allows_bounty_splitting')
+    if old_bbp != new_bbp:
+        if old_bbp:
+            alerts.append("Changed from **BBP** to **VDP** ")
+        else:
+            alerts.append("Changed from **VDP** to **BBP** ")
+
+    # Scope change detection
+    old_targets = old.get('targets', {})
+    new_targets = new.get('targets', {})
 
     old_scopes = {s['asset_identifier']: s for s in old_targets.get('in_scope', []) if s}
     new_scopes = {s['asset_identifier']: s for s in new_targets.get('in_scope', []) if s}
 
-    added_scopes = []
-    removed_scopes = []
-    changed_scopes = {}
-
     for identifier in new_scopes:
         if identifier not in old_scopes:
-            added_scopes.append(new_scopes[identifier])
-    
+            alerts.append(f"New Scope: `{identifier}` → **{new_scopes[identifier].get('max_severity', 'N/A')}**")
+        elif identifier in old_scopes:
+            old_sev = old_scopes[identifier].get('max_severity')
+            new_sev = new_scopes[identifier].get('max_severity')
+            if old_sev != new_sev:
+                alerts.append(f"Severity Changed: `{identifier}` → `{old_sev}` → `{new_sev}`")
+
     for identifier in old_scopes:
         if identifier not in new_scopes:
-            removed_scopes.append(old_scopes[identifier])
-        elif identifier in new_scopes:
-            scope_diff = DeepDiff(old_scopes[identifier], new_scopes[identifier], ignore_order=True)
-            if scope_diff:
-                changed_scopes[identifier] = scope_diff
+            alerts.append(f"Removed Scope: `{identifier}` → **{old_scopes[identifier].get('max_severity', 'N/A')}**")
 
-    if added_scopes or removed_scopes or changed_scopes:
-        change_details = []
-        
-        for scope in added_scopes:
-            change_details.append(f"New Inscope: `{scope['asset_identifier']}` ({scope.get('asset_type', 'N/A')}) → **{scope.get('max_severity', 'N/A')}**")
-        
-        for scope in removed_scopes:
-            change_details.append(f"Removed Inscope: `{scope['asset_identifier']}` ({scope.get('asset_type', 'N/A')}) → **{scope.get('max_severity', 'N/A')}**")
-        
-        for identifier, diff in changed_scopes.items():
-            change_details.append(f"Changed Inscope ({identifier}): ```diff\n{json.dumps(diff, indent=2)}```")
-
-        if change_details:
-            notify_event('changed_scope', platform, name, url, {
-                "change_details": "\n".join(change_details)
-            }, webhook)
-
-    old_out = set(x['asset_identifier'] for x in old_targets.get('out_of_scope', []) if x)
-    new_out = set(x['asset_identifier'] for x in new_targets.get('out_of_scope', []) if x)
-
-    out_of_scope_details = []
-    for added in new_out - old_out:
-        out_of_scope_details.append(f"New Out of Scope: `{added}`")
-    for removed in old_out - new_out:
-        out_of_scope_details.append(f"Removed Out of Scope: `{removed}`")
-    
-    if out_of_scope_details:
+    if alerts:
         notify_event('changed_scope', platform, name, url, {
-            "change_details": "\n".join(out_of_scope_details)
+            "change_details": "\n".join(alerts)
         }, webhook)
-
-    # general_diff = DeepDiff(
-    #     old, new, ignore_order=True, 
-    #     exclude_paths=["root['targets']", "root['response_efficiency_percentage']"]
-    # )
-    
-    # if general_diff and webhook:
-    #     notify_event('new_type', platform, name, url, {"changes": json.dumps(general_diff, indent=2)}, webhook)

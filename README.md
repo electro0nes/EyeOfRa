@@ -7,7 +7,7 @@ Built with ❤️ by [electro0ne (Moein Erfanian)](https://github.com/electro0ne
 
 Eye of Ra monitors public bug bounty platforms and **alerts you via Discord** when:
 
-- 🖕 A new program is added
+- ✅ A new program is added
 - ❌ A program is removed
 - 🟢 New in-scope assets are added
 - 🔴 In-scope assets are removed

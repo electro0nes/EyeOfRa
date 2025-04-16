@@ -1,9 +1,21 @@
 from pymongo import MongoClient
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
-MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
+MONGO_USER = os.getenv("MONGO_USER")
+MONGO_PASS = os.getenv("MONGO_PASS")
+MONGO_HOST = os.getenv("MONGO_HOST", "localhost")
+MONGO_PORT = os.getenv("MONGO_PORT", "27017")
+MONGO_DB   = os.getenv("MONGO_DB", "bugbounty")
+
+if MONGO_USER and MONGO_PASS:
+    MONGO_URI = f"mongodb://{MONGO_USER}:{MONGO_PASS}@{MONGO_HOST}:{MONGO_PORT}/{MONGO_DB}"
+else:
+    MONGO_URI = f"mongodb://{MONGO_HOST}:{MONGO_PORT}/{MONGO_DB}"
+
 client = MongoClient(MONGO_URI)
-db = client['bugbounty']
+db = client[MONGO_DB]
 programs = db['programs']
 
 def insert_or_update_program(platform, handle, name, data):

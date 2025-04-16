@@ -61,7 +61,11 @@ pip3 install -r requirements.txt
 2. Configure `config.yaml` and `.env` file with your **Discord Webhook** and database settings.
 
 ```bash
-MONGO_URI=mongodb://localhost:27017
+MONGO_USER=myuser
+MONGO_PASS=mypassword
+MONGO_HOST=localhost
+MONGO_PORT=27017
+MONGO_DB=bugbounty
 DISCORD_WEBHOOK=URL
 ```
 
